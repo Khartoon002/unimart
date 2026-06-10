@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -36,8 +36,22 @@ declare module "next-auth" {
   }
 }
 
+// Typed error subclasses — the code property is what NextAuth returns in result.error
+class NoAccountError extends CredentialsSignin {
+  code = "no_account";
+}
+class WrongPasswordError extends CredentialsSignin {
+  code = "wrong_password";
+}
+class InvalidInputError extends CredentialsSignin {
+  code = "invalid_input";
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  // Support both AUTH_SECRET (v5 standard) and NEXTAUTH_SECRET (legacy) so
+  // existing deployments that haven't renamed the env var still work.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       name: "Credentials",
@@ -47,7 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!parsed.success) throw new InvalidInputError();
 
         const { email, password } = parsed.data;
 
@@ -56,10 +70,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           include: { merchantProfile: { select: { id: true } } },
         });
 
-        if (!user) return null;
+        if (!user) throw new NoAccountError();
 
         const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return null;
+        if (!valid) throw new WrongPasswordError();
 
         return {
           id: user.id,
