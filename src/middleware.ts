@@ -1,13 +1,9 @@
-import NextAuth from "next-auth";
-import { authConfig } from "@/auth.config";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const { auth } = NextAuth(authConfig);
-
-// Auth pages — redirect to marketplace if already signed in
 const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
-// Pages that require authentication
 const PROTECTED_PATHS = [
   "/cart",
   "/checkout",
@@ -25,7 +21,6 @@ const PROTECTED_PATHS = [
   "/merchant-orders",
 ];
 
-// Subset of protected paths that also require the MERCHANT role
 const MERCHANT_PATHS = [
   "/dashboard",
   "/listings",
@@ -34,41 +29,46 @@ const MERCHANT_PATHS = [
   "/merchant-orders",
 ];
 
-export default auth((req) => {
-  const { nextUrl, auth: session } = req;
-  const path = nextUrl.pathname;
+export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: process.env.NODE_ENV === "production",
+  });
 
   const isAuthPath = AUTH_PATHS.some((p) => path.startsWith(p));
   const isProtected = PROTECTED_PATHS.some((p) => path.startsWith(p));
   const isMerchantPath = MERCHANT_PATHS.some((p) => path.startsWith(p));
 
   // Redirect signed-in users away from auth pages
-  if (isAuthPath && session?.user) {
+  if (isAuthPath && token) {
     return NextResponse.redirect(new URL("/marketplace", req.url));
   }
 
   // Require login for protected paths
-  if (isProtected && !session?.user) {
+  if (isProtected && !token) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", path);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (session?.user && isProtected) {
+  if (token && isProtected) {
     // Redirect non-onboarded users to onboarding
-    if (!session.user.onboardingDone && path !== "/onboarding") {
+    if (!token.onboardingDone && path !== "/onboarding") {
       return NextResponse.redirect(new URL("/onboarding", req.url));
     }
 
     // Redirect buyers away from merchant-only pages
-    const roles = ((session.user as unknown as Record<string, unknown>).roles as string[] | undefined) ?? [];
+    const roles = (token.roles as string[] | undefined) ?? [];
     if (isMerchantPath && !roles.includes("MERCHANT")) {
       return NextResponse.redirect(new URL("/marketplace", req.url));
     }
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
