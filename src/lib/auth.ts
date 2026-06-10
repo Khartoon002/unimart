@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/lib/validations";
+import { authConfig } from "@/auth.config";
 import type { UserRole } from "@prisma/client";
 
 declare module "next-auth" {
@@ -35,9 +36,8 @@ declare module "next-auth" {
   }
 }
 
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
+  ...authConfig,
   providers: [
     Credentials({
       name: "Credentials",
@@ -76,40 +76,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
-  callbacks: {
-    async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.id;
-        token.roles = user.roles;
-        token.activeRole = user.activeRole;
-        token.onboardingDone = user.onboardingDone;
-        token.merchantProfileId = user.merchantProfileId;
-        token.faculty = user.faculty;
-        token.hostel = user.hostel;
-      }
-      if (trigger === "update") {
-        if (session?.activeRole) token.activeRole = session.activeRole as UserRole;
-        if (session?.roles) token.roles = session.roles as UserRole[];
-        if (session?.onboardingDone !== undefined) token.onboardingDone = session.onboardingDone;
-        if (session?.merchantProfileId !== undefined) token.merchantProfileId = session.merchantProfileId;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      const t = token as Record<string, unknown>;
-      session.user.id = t.id as string;
-      session.user.roles = t.roles as UserRole[];
-      session.user.activeRole = t.activeRole as UserRole;
-      session.user.onboardingDone = t.onboardingDone as boolean;
-      session.user.merchantProfileId = t.merchantProfileId as string | null | undefined;
-      session.user.faculty = t.faculty as string | null | undefined;
-      session.user.hostel = t.hostel as string | null | undefined;
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
 });

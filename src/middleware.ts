@@ -1,5 +1,8 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 import { NextResponse } from "next/server";
+
+const { auth } = NextAuth(authConfig);
 
 // Auth pages — redirect to marketplace if already signed in
 const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
@@ -58,7 +61,8 @@ export default auth((req) => {
     }
 
     // Redirect buyers away from merchant-only pages
-    if (isMerchantPath && !session.user.roles?.includes("MERCHANT")) {
+    const roles = ((session.user as unknown as Record<string, unknown>).roles as string[] | undefined) ?? [];
+    if (isMerchantPath && !roles.includes("MERCHANT")) {
       return NextResponse.redirect(new URL("/marketplace", req.url));
     }
   }
