@@ -1,3 +1,5 @@
+"use client";
+
 // NO top-level import of pusher-js — it accesses the `location` global at module
 // load time, which crashes during Next.js SSG. We lazy-require it inside the
 // function, which only runs inside useEffect (client-side).
