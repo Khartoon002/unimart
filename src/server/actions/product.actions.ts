@@ -33,7 +33,7 @@ export async function createProduct(input: CreateProductInput): Promise<ActionRe
         data: {
           merchantId: merchant.id,
           title: data.title,
-          description: data.description,
+          description: data.description ?? "",
           price: data.price,
           compareAtPrice: data.compareAtPrice ?? null,
           category: data.category,
@@ -186,7 +186,7 @@ export async function toggleProductStatus(id: string): Promise<ActionResult> {
     if (!product) return { error: "Product not found" };
     if (product.merchant.userId !== session.user.id) return { error: "Unauthorized" };
 
-    const newStatus = product.status === "ACTIVE" ? "PAUSED" : "ACTIVE";
+    const newStatus = product.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
     const updated = await prisma.product.update({
       where: { id },
       data: { status: newStatus },

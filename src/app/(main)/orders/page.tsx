@@ -5,6 +5,7 @@ import { Package } from "lucide-react";
 import { useOrders } from "@/hooks/useOrders";
 import { OrderCard } from "@/components/unimart/OrderCard";
 import { EmptyState } from "@/components/unimart/EmptyState";
+import type { OrderWithDetails } from "@/types";
 
 const STATUS_TABS = [
   { value: undefined, label: "All" },
@@ -17,7 +18,8 @@ const STATUS_TABS = [
 
 export default function OrdersPage() {
   const [status, setStatus] = useState<string | undefined>(undefined);
-  const { data, isLoading } = useOrders(status);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = useOrders(status as any);
   const orders = data?.orders ?? [];
 
   return (
@@ -54,7 +56,7 @@ export default function OrdersPage() {
         <EmptyState icon={Package} title="No orders yet" description="Your orders will appear here once you place one." action={{ label: "Start shopping", href: "/marketplace" }} />
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => <OrderCard key={order.id} order={order} />)}
+          {(orders as OrderWithDetails[]).map((order) => <OrderCard key={order.id} order={order} />)}
         </div>
       )}
     </div>

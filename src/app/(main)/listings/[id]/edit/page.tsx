@@ -39,6 +39,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
       price: product.price,
       compareAtPrice: product.compareAtPrice,
       stock: product.stock,
+      status: product.status as "ACTIVE" | "INACTIVE" | "DRAFT",
       isPerishable: product.isPerishable,
       expiresAt: product.expiresAt ? new Date(product.expiresAt).toISOString().slice(0, 16) : undefined,
       tags: product.tags,

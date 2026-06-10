@@ -72,7 +72,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       {/* Items */}
       <div className="p-5 rounded-2xl space-y-3" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
         <h2 className="font-semibold">Items</h2>
-        {order.items.map((item) => (
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {order.items.map((item: any) => (
           <div key={item.id} className="flex gap-3">
             <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0" style={{ background: "var(--color-surface-2)" }}>
               {item.product.images[0] && <Image src={item.product.images[0]} alt={item.product.title} fill className="object-cover" />}

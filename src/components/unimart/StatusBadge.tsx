@@ -2,6 +2,8 @@ const variants: Record<string, { bg: string; color: string; dot: string; label: 
   // Product statuses
   ACTIVE:     { bg: "rgba(34,197,94,0.12)",  color: "#22c55e", dot: "#22c55e", label: "Live" },
   PAUSED:     { bg: "rgba(156,163,175,0.12)", color: "#9ca3af", dot: "#9ca3af", label: "Paused" },
+  INACTIVE:   { bg: "rgba(156,163,175,0.12)", color: "#9ca3af", dot: "#9ca3af", label: "Paused" },
+  DRAFT:      { bg: "rgba(245,158,11,0.12)",  color: "#f59e0b", dot: "#f59e0b", label: "Draft" },
   EXPIRED:    { bg: "rgba(239,68,68,0.12)",   color: "#ef4444", dot: "#ef4444", label: "Expired" },
   // Order statuses
   PENDING:    { bg: "rgba(245,158,11,0.12)",  color: "#f59e0b", dot: "#f59e0b", label: "Pending" },

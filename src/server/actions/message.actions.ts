@@ -40,8 +40,8 @@ export async function sendMessage(input: SendMessageInput): Promise<ActionResult
             productId: productRefId ?? null,
             participants: {
               create: [
-                { userId: session.user.id },
-                { userId: recipientId },
+                { userId: session.user.id! },
+                { userId: recipientId! },
               ],
             },
           },

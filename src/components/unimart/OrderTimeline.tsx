@@ -19,7 +19,7 @@ interface OrderTimelineProps {
 }
 
 export function OrderTimeline({ currentStatus, events = [] }: OrderTimelineProps) {
-  if (currentStatus === "CANCELLED" || currentStatus === "REFUNDED") {
+  if (currentStatus === "CANCELLED" || currentStatus === "DISPUTED") {
     return (
       <div className="rounded-2xl p-5 text-center"
         style={{ background: "var(--color-surface-2)", border: "1px dashed var(--color-border)" }}>

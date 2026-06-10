@@ -35,17 +35,6 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    roles: UserRole[];
-    activeRole: UserRole;
-    onboardingDone: boolean;
-    merchantProfileId?: string | null;
-    faculty?: string | null;
-    hostel?: string | null;
-  }
-}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -108,13 +97,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.roles = token.roles;
-      session.user.activeRole = token.activeRole;
-      session.user.onboardingDone = token.onboardingDone;
-      session.user.merchantProfileId = token.merchantProfileId;
-      session.user.faculty = token.faculty;
-      session.user.hostel = token.hostel;
+      const t = token as Record<string, unknown>;
+      session.user.id = t.id as string;
+      session.user.roles = t.roles as UserRole[];
+      session.user.activeRole = t.activeRole as UserRole;
+      session.user.onboardingDone = t.onboardingDone as boolean;
+      session.user.merchantProfileId = t.merchantProfileId as string | null | undefined;
+      session.user.faculty = t.faculty as string | null | undefined;
+      session.user.hostel = t.hostel as string | null | undefined;
       return session;
     },
   },

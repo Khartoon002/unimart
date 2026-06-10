@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: Props) {
             <div className="flex items-center justify-between p-4 rounded-2xl"
               style={{ background: "color-mix(in srgb, var(--color-fresh) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-fresh) 30%, transparent)" }}>
               <span className="text-sm font-medium" style={{ color: "var(--color-fresh)" }}>Expires in</span>
-              <CountdownTimer expiresAt={product.expiresAt} size="md" />
+              <CountdownTimer expiresAt={product.expiresAt} size="base" />
             </div>
           )}
 

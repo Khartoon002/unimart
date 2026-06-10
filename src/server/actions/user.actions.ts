@@ -157,7 +157,7 @@ export async function deleteAddress(id: string): Promise<ActionResult> {
 export async function completeOnboarding(
   data: OnboardingBuyerInput | OnboardingMerchantInput,
   role: "BUYER" | "MERCHANT"
-): Promise<ActionResult> {
+): Promise<ActionResult<{ merchantProfileId: string } | null>> {
   const session = await auth();
   if (!session?.user) redirect("/login");
 

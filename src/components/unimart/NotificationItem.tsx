@@ -3,13 +3,15 @@ import { Bell, Package, MessageCircle, Star, Wallet, ShoppingBag } from "lucide-
 import { formatRelativeTime } from "@/lib/utils";
 import type { NotifType } from "@prisma/client";
 
-const ICONS: Record<NotifType, typeof Bell> = {
-  ORDER_STATUS: Package,
-  PAYMENT: Wallet,
-  MESSAGE: MessageCircle,
-  REVIEW: Star,
-  SYSTEM: Bell,
-  PRODUCT: ShoppingBag,
+const ICONS: Partial<Record<NotifType, typeof Bell>> = {
+  NEW_ORDER: Package,
+  ORDER_SHIPPED: Package,
+  ORDER_CONFIRMED: Package,
+  ORDER_DELIVERED: Package,
+  PAYMENT_RECEIVED: Wallet,
+  NEW_REVIEW: Star,
+  LISTING_EXPIRING: ShoppingBag,
+  ANNOUNCEMENT: Bell,
 };
 
 interface NotifData {

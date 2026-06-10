@@ -57,10 +57,10 @@ export default function CartPage() {
                   )}
                   <PriceTag price={item.price} size="sm" className="mt-1" />
                   <div className="flex items-center justify-between mt-3">
-                    <QtyStepper value={item.quantity} max={99} onChange={(q) => updateQuantity(item.id, q)} size="sm" />
+                    <QtyStepper value={item.quantity} max={99} onChange={(q) => updateQuantity(item.productId, q)} size="sm" />
                     <div className="flex items-center gap-3">
                       <span className="font-semibold text-sm">{formatPrice(item.price * item.quantity)}</span>
-                      <button onClick={() => removeItem(item.id)} style={{ color: "var(--color-danger)" }}>
+                      <button onClick={() => removeItem(item.productId)} style={{ color: "var(--color-danger)" }}>
                         <Trash2 size={15} />
                       </button>
                     </div>

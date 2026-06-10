@@ -3,18 +3,18 @@
 import { Star } from "lucide-react";
 
 interface RatingStarsProps {
-  rating: number;
+  value: number;
   max?: number;
   size?: number;
   interactive?: boolean;
   onChange?: (v: number) => void;
 }
 
-export function RatingStars({ rating, max = 5, size = 14, interactive, onChange }: RatingStarsProps) {
+export function RatingStars({ value, max = 5, size = 14, interactive, onChange }: RatingStarsProps) {
   return (
     <span className="inline-flex gap-0.5">
       {Array.from({ length: max }, (_, i) => {
-        const filled = i + 1 <= Math.round(rating);
+        const filled = i + 1 <= Math.round(value);
         return (
           <Star
             key={i}

@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           <p className="text-sm text-center py-8" style={{ color: "var(--color-text-3)" }}>No orders yet. Share your store!</p>
         ) : (
           <div className="space-y-2">
-            {recentOrders.slice(0, 5).map((order: { id: string; paystackRef: string | null; total: number; status: string; createdAt: string | Date }) => (
+            {recentOrders.slice(0, 5).map((order: { id: string; paystackRef: string | null; total: { toNumber(): number } | number; status: string; createdAt: string | Date }) => (
               <Link key={order.id} href={`/merchant-orders/${order.id}`}
                 className="flex items-center justify-between p-4 rounded-xl transition-colors hover-border-primary block"
                 style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
