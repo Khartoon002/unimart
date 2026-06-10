@@ -1,10 +1,11 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Auth pages — redirect to marketplace if already signed in
 const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
-// Pages that require a session cookie
+// Pages that require authentication
 const PROTECTED_PATHS = [
   "/cart",
   "/checkout",
@@ -22,34 +23,55 @@ const PROTECTED_PATHS = [
   "/merchant-orders",
 ];
 
-function hasSessionCookie(req: NextRequest): boolean {
-  // Check both secure (prod) and plain (dev) cookie names
-  return !!(
-    req.cookies.get("__Secure-authjs.session-token")?.value ||
-    req.cookies.get("authjs.session-token")?.value
-  );
-}
+// Subset that also requires the MERCHANT role
+const MERCHANT_PATHS = [
+  "/dashboard",
+  "/listings",
+  "/analytics",
+  "/earnings",
+  "/merchant-orders",
+];
 
-export function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const authenticated = hasSessionCookie(req);
+
+  // Proxy runs on Node.js runtime (Next.js 16+), so next-auth/jwt is fine here
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: process.env.NODE_ENV === "production",
+  });
 
   const isAuthPath = AUTH_PATHS.some((p) => path.startsWith(p));
   const isProtected = PROTECTED_PATHS.some((p) => path.startsWith(p));
+  const isMerchantPath = MERCHANT_PATHS.some((p) => path.startsWith(p));
 
   // Redirect signed-in users away from auth pages
-  if (isAuthPath && authenticated) {
+  if (isAuthPath && token) {
     return NextResponse.redirect(new URL("/marketplace", req.url));
   }
 
   // Require login for protected paths
-  if (isProtected && !authenticated) {
+  if (isProtected && !token) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", path);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Pass x-pathname so the server layout can do onboarding / role redirects
+  if (token && isProtected) {
+    // Redirect non-onboarded users
+    if (!token.onboardingDone && path !== "/onboarding") {
+      return NextResponse.redirect(new URL("/onboarding", req.url));
+    }
+
+    // Redirect buyers away from merchant-only pages
+    const roles = (token.roles as string[] | undefined) ?? [];
+    if (isMerchantPath && !roles.includes("MERCHANT")) {
+      return NextResponse.redirect(new URL("/marketplace", req.url));
+    }
+  }
+
+  // Pass pathname so server layouts can read the current route
   const response = NextResponse.next();
   response.headers.set("x-pathname", path);
   return response;
