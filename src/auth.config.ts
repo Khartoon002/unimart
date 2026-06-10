@@ -1,5 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
-import type { UserRole } from "@prisma/client";
+
+// Inline type so this file has zero imports from @prisma/client (Edge-safe)
+type UserRole = "BUYER" | "MERCHANT";
 
 // Edge-safe config: no Prisma, no bcrypt — used by middleware
 export const authConfig = {
