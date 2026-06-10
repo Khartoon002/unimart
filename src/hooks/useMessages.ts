@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { getPusherClient } from "@/lib/pusher";
+import { getPusherClient } from "@/lib/pusher-client";
 import type { Message } from "@prisma/client";
 
 export function useConversations() {

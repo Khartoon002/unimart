@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { getPusherClient } from "@/lib/pusher";
+import { getPusherClient } from "@/lib/pusher-client";
 import type { Channel } from "pusher-js";
 
 export function usePusherChannel(

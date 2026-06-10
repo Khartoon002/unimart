@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendMessageSchema, type SendMessageInput } from "@/lib/validations";
-import { triggerEvent } from "@/lib/pusher";
+import { triggerEvent } from "@/lib/pusher-server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ActionResult, ConversationWithDetails } from "@/types";
