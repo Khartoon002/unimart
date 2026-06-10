@@ -103,33 +103,7 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
 
-          {/* Description */}
-          {product.description && (
-            <div>
-              <h3 className="font-semibold mb-2">About this item</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-2)" }}>{product.description}</p>
-            </div>
-          )}
-
-          {/* Variants */}
-          {product.variants.map((variant) => (
-            <div key={variant.id}>
-              <h3 className="font-semibold mb-2 text-sm">{variant.name}</h3>
-              <div className="flex flex-wrap gap-2">
-                {variant.options.map((opt) => (
-                  <div key={opt.id} className="px-3 py-1.5 rounded-xl text-sm font-medium"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
-                    {opt.label}
-                    {opt.price != null && Number(opt.price) > 0 && (
-                      <span style={{ color: "var(--color-text-3)" }}> (+₦{Number(opt.price).toLocaleString()})</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {/* Add to cart */}
+          {/* Add to cart — placed before description so it's reachable on mobile */}
           {isOwner ? (
             <div className="flex items-center gap-2.5 h-12 px-4 rounded-2xl text-sm font-medium"
               style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text-3)" }}>
@@ -138,6 +112,36 @@ export default async function ProductPage({ params }: Props) {
             </div>
           ) : !isExpired && (
             <AddToCartButton product={{ id: product.id, title: product.title, price, images: product.images, stock: product.stock, merchantId: product.merchantId, merchantStoreName: product.merchant.storeName }} />
+          )}
+
+          {/* Variants */}
+          {product.variants.length > 0 && (
+            <div className="space-y-4 pt-1">
+              {product.variants.map((variant) => (
+                <div key={variant.id}>
+                  <h3 className="font-semibold mb-2 text-sm">{variant.name}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {variant.options.map((opt) => (
+                      <div key={opt.id} className="px-3 py-1.5 rounded-xl text-sm font-medium"
+                        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
+                        {opt.label}
+                        {opt.price != null && Number(opt.price) > 0 && (
+                          <span style={{ color: "var(--color-text-3)" }}> (+₦{Number(opt.price).toLocaleString()})</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Description */}
+          {product.description && (
+            <div>
+              <h3 className="font-semibold mb-2">About this item</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-2)" }}>{product.description}</p>
+            </div>
           )}
         </div>
       </div>

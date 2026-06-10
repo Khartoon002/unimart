@@ -43,10 +43,10 @@ export default async function ListingsPage() {
       ) : (
         <div className="space-y-3">
           {products.map((product) => (
-            <div key={product.id} className="flex items-center gap-4 p-4 rounded-2xl"
+            <div key={product.id} className="flex items-center gap-3 p-4 rounded-2xl"
               style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
               {/* Thumbnail */}
-              <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0"
+              <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0"
                 style={{ background: "var(--color-surface-2)" }}>
                 {product.images[0] && (
                   <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
@@ -58,17 +58,23 @@ export default async function ListingsPage() {
                 <Link href={`/product/${product.id}`}>
                   <p className="font-medium text-sm truncate hover:underline">{product.title}</p>
                 </Link>
-                <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <PriceTag price={Number(product.price)} size="sm" />
-                  <span className="text-xs" style={{ color: "var(--color-text-3)" }}>
+                  <span className="text-xs hidden sm:inline" style={{ color: "var(--color-text-3)" }}>
                     {product.stock} in stock
+                  </span>
+                  {/* Status badge inline on mobile */}
+                  <span className="sm:hidden">
+                    <StatusBadge status={product.status} />
                   </span>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <StatusBadge status={product.status} />
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <span className="hidden sm:block">
+                  <StatusBadge status={product.status} />
+                </span>
                 <PauseToggleButton productId={product.id} status={product.status} />
                 <Link href={`/listings/${product.id}/edit`}>
                   <button className="h-8 px-3 rounded-lg text-xs font-semibold"

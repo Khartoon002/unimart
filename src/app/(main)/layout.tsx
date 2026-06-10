@@ -19,7 +19,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       {/* Single content area — responsive padding handled in MainContent */}
       <MainContent>
         <TopBar />
-        <main className="px-4 md:px-8 pb-24 md:pb-12 pt-2">{children}</main>
+        <main className="px-4 md:px-6 pb-28 md:pb-12 pt-2">{children}</main>
       </MainContent>
 
       {/* Mobile bottom nav */}

@@ -73,7 +73,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-0">
       <h1 className="font-display text-2xl font-bold">Checkout</h1>
 
       {merchantCount > 1 && (
@@ -144,8 +144,8 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Right: Summary */}
-        <div>
+        {/* Right: Summary — desktop only */}
+        <div className="hidden lg:block">
           <div className="rounded-2xl p-5 sticky top-20 space-y-4"
             style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
             <h2 className="font-semibold text-lg">Order total</h2>
@@ -177,6 +177,24 @@ export default function CheckoutPage() {
               {pending ? "Processing…" : `Pay ${formatPrice(total)}`}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile sticky pay bar */}
+      <div className="lg:hidden fixed bottom-14 left-0 right-0 z-40 px-4 pb-2 pt-3"
+        style={{ background: "var(--color-bg)", borderTop: "1px solid var(--color-border)" }}>
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <p className="text-xs" style={{ color: "var(--color-text-3)" }}>Total (incl. fees)</p>
+            <p className="font-bold text-base">{formatPrice(total)}</p>
+          </div>
+          <button
+            onClick={handleCheckout}
+            disabled={pending || !selectedAddressId || merchantCount > 1}
+            className="flex-shrink-0 h-11 px-6 rounded-2xl font-semibold text-sm transition-opacity disabled:opacity-40"
+            style={{ background: "var(--color-primary)", color: "#fff" }}>
+            {pending ? "Processing…" : "Pay now"}
+          </button>
         </div>
       </div>
     </div>

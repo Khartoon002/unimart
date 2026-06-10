@@ -43,7 +43,7 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 h-16 px-6"
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 h-14 md:h-16 px-4 md:px-6"
       style={{ background: "linear-gradient(180deg, var(--color-bg) 70%, transparent)", backdropFilter: "blur(8px)" }}>
       {/* Brand wordmark (small, shown only on desktop) */}
       <span className="hidden lg:block text-sm font-bold tracking-tight" style={{ color: "var(--color-text-3)" }}>
@@ -87,7 +87,7 @@ export function TopBar() {
                 )}
               </button>
               {notifOpen && (
-                <div className="absolute top-12 right-0 w-80 rounded-2xl overflow-hidden animate-slide-down z-50"
+                <div className="absolute top-12 right-0 w-80 max-w-[calc(100vw-1rem)] rounded-2xl overflow-hidden animate-slide-down z-50"
                   style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-modal)" }}>
                   <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <span className="font-semibold text-sm">Notifications</span>
@@ -142,7 +142,7 @@ export function TopBar() {
                 )}
               </button>
               {userOpen && (
-                <div className="absolute top-12 right-0 w-52 rounded-2xl overflow-hidden animate-slide-down z-50"
+                <div className="absolute top-12 right-0 w-52 max-w-[calc(100vw-1rem)] rounded-2xl overflow-hidden animate-slide-down z-50"
                   style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-modal)" }}>
                   <div className="px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <p className="font-semibold text-sm truncate">{user.name}</p>

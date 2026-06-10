@@ -31,7 +31,7 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="max-w-lg mx-auto flex flex-col h-[calc(100vh-8rem)]">
+    <div className="max-w-lg mx-auto flex flex-col h-[calc(100svh-168px)] md:h-[calc(100svh-120px)]">
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 mb-4 flex-shrink-0"
         style={{ borderBottom: "1px solid var(--color-border)" }}>
