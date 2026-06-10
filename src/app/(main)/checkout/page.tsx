@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -31,10 +31,14 @@ export default function CheckoutPage() {
     },
   });
 
-  if (!items.length) {
-    router.replace("/cart");
-    return null;
-  }
+  // Cart is loaded from localStorage after hydration; calling router.replace during
+  // render crashes SSR because router.replace falls back to `location` on the server.
+  // Move the redirect to useEffect so it only runs client-side.
+  useEffect(() => {
+    if (!items.length) router.replace("/cart");
+  }, [items.length, router]);
+
+  if (!items.length) return null;
 
   const fee = calculatePlatformFee(subtotal);
   const total = calculateTotal(subtotal, fee, DELIVERY_FEE);

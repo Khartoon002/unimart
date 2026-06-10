@@ -34,6 +34,7 @@ export function useMessages(conversationId: string) {
   useEffect(() => {
     if (!conversationId) return;
     const pusher = getPusherClient();
+    if (!pusher) return;
     const channel = pusher.subscribe(`private-conversation-${conversationId}`);
     channel.bind("new-message", (msg: Message) => {
       qc.setQueryData(
