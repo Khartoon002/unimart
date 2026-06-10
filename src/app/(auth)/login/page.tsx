@@ -6,16 +6,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { toast } from "sonner";
 import { loginSchema, type LoginInput } from "@/lib/validations";
-import { Eye, EyeOff, Loader2, ShoppingBag } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShoppingBag, AlertCircle } from "lucide-react";
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  CredentialsSignin: "Incorrect email or password. Please check and try again.",
+  OAuthAccountNotLinked: "This email is linked to a different sign-in method.",
+  OAuthSignin: "Could not sign in with that provider. Try again.",
+  OAuthCallback: "Sign-in was cancelled or failed. Try again.",
+  SessionRequired: "You need to sign in to access that page.",
+  Default: "Sign in failed. Please try again.",
+};
+
+function getErrorMessage(code: string | null): string {
+  if (!code) return "";
+  return AUTH_ERROR_MESSAGES[code] ?? AUTH_ERROR_MESSAGES.Default;
+}
 
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const from = params.get("callbackUrl") ?? "/marketplace";
+
+  // NextAuth redirects here with ?error= when auth fails server-side
+  const urlError = params.get("error");
+
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string>(getErrorMessage(urlError));
 
   const {
     register,
@@ -25,6 +43,7 @@ function LoginForm() {
 
   async function onSubmit(data: LoginInput) {
     setLoading(true);
+    setAuthError("");
     try {
       const result = await signIn("credentials", {
         email: data.email,
@@ -33,11 +52,13 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error("Invalid email or password");
+        setAuthError(getErrorMessage(result.error));
       } else {
         router.push(from);
         router.refresh();
       }
+    } catch {
+      setAuthError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -50,7 +71,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
             <ShoppingBag size={28} style={{ color: "var(--color-primary)" }} />
-            <span className="font-display text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
+            <span className="text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
               UniMart
             </span>
           </div>
@@ -64,7 +85,21 @@ function LoginForm() {
           className="rounded-2xl p-8"
           style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-modal)" }}
         >
-          <h1 className="font-display text-2xl font-semibold mb-6">Welcome back</h1>
+          <h1 className="text-2xl font-semibold mb-6">Welcome back</h1>
+
+          {/* Inline auth error banner */}
+          {authError && (
+            <div
+              className="flex items-start gap-3 p-3.5 rounded-xl mb-5 text-sm"
+              style={{
+                background: "var(--color-danger-soft)",
+                border: "1px solid var(--color-danger)",
+              }}
+            >
+              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" style={{ color: "var(--color-danger)" }} />
+              <p style={{ color: "var(--color-danger)" }}>{authError}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}

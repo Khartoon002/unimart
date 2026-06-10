@@ -11,32 +11,53 @@ interface QtyStepperProps {
 }
 
 export function QtyStepper({ value, min = 1, max = 99, onChange, size = "md" }: QtyStepperProps) {
-  const h = size === "sm" ? "h-7" : "h-9";
-  const btnW = size === "sm" ? "w-7" : "w-9";
-  const numW = size === "sm" ? "w-7 text-xs" : "w-10 text-sm";
+  const isSm = size === "sm";
+  const btnSize = isSm ? "w-7 h-7" : "w-9 h-9";
+  const numSize = isSm ? "min-w-[28px] text-xs" : "min-w-[36px] text-sm";
+  const iconSize = isSm ? 12 : 14;
+  const wrapH = isSm ? "h-7" : "h-9";
 
   return (
-    <div className={`inline-flex items-center rounded-xl overflow-hidden ${h}`}
-      style={{ border: "1px solid var(--color-border)", background: "var(--color-surface-2)" }}>
+    <div
+      className={`inline-flex items-center gap-1 rounded-full px-1 ${wrapH}`}
+      style={{
+        background: "var(--color-surface-2)",
+        border: "1px solid var(--color-border)",
+      }}
+    >
       <button
+        type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
-        className={`${btnW} ${h} flex items-center justify-center transition-colors disabled:opacity-30`}
-        style={{ color: "var(--color-text-2)" }}
+        className={`${btnSize} rounded-full flex items-center justify-center transition-all disabled:opacity-30 flex-shrink-0`}
+        style={{
+          background: value <= min ? "transparent" : "var(--color-surface)",
+          color: "var(--color-text-1)",
+          border: value <= min ? "none" : "1px solid var(--color-border)",
+        }}
       >
-        <Minus size={size === "sm" ? 12 : 14} />
+        <Minus size={iconSize} strokeWidth={2.5} />
       </button>
-      <span className={`${numW} ${h} flex items-center justify-center font-semibold select-none`}
-        style={{ color: "var(--color-text-1)" }}>
+
+      <span
+        className={`${numSize} flex items-center justify-center font-bold select-none tabular-nums`}
+        style={{ color: "var(--color-primary)" }}
+      >
         {value}
       </span>
+
       <button
+        type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
-        className={`${btnW} ${h} flex items-center justify-center transition-colors disabled:opacity-30`}
-        style={{ color: "var(--color-text-2)" }}
+        className={`${btnSize} rounded-full flex items-center justify-center transition-all disabled:opacity-30 flex-shrink-0`}
+        style={{
+          background: value >= max ? "transparent" : "var(--color-primary)",
+          color: value >= max ? "var(--color-text-3)" : "#fff",
+          border: "none",
+        }}
       >
-        <Plus size={size === "sm" ? 12 : 14} />
+        <Plus size={iconSize} strokeWidth={2.5} />
       </button>
     </div>
   );

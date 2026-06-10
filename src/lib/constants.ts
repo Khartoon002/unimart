@@ -66,6 +66,33 @@ export const PRODUCT_CATEGORIES: {
   { value: "OTHER", label: "Other", icon: "Package" },
 ];
 
+export const CATEGORY_VARIANTS: Record<string, { name: string; options: string[] }[]> = {
+  FASHION: [
+    { name: "Size", options: ["XS", "S", "M", "L", "XL", "XXL"] },
+    { name: "Color", options: ["Black", "White", "Navy", "Grey", "Brown", "Red", "Green"] },
+  ],
+  ELECTRONICS: [
+    { name: "Storage", options: ["64GB", "128GB", "256GB", "512GB", "1TB"] },
+    { name: "Color", options: ["Black", "White", "Silver", "Space Grey", "Gold"] },
+  ],
+  FOOD: [
+    { name: "Portion", options: ["Small", "Medium", "Large", "Family Size"] },
+  ],
+  BEAUTY: [
+    { name: "Shade", options: ["Light", "Medium Light", "Medium", "Medium Dark", "Dark"] },
+    { name: "Size", options: ["Mini", "Regular", "Large"] },
+  ],
+  SPORTS: [
+    { name: "Size", options: ["XS", "S", "M", "L", "XL", "XXL"] },
+    { name: "Color", options: ["Black", "White", "Red", "Blue", "Green"] },
+  ],
+  BOOKS: [],
+  SERVICES: [],
+  ART: [],
+  STATIONERY: [],
+  OTHER: [],
+};
+
 export const PLATFORM_FEE_PERCENT = parseFloat(
   process.env.PLATFORM_FEE_PERCENT ?? "2.5"
 );

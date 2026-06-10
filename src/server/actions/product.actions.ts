@@ -103,24 +103,47 @@ export async function updateProduct(
     if (!product) return { error: "Product not found" };
     if (product.merchant.userId !== session.user.id) return { error: "Unauthorized" };
 
-    const updated = await prisma.product.update({
-      where: { id },
-      data: {
-        ...(input.title && { title: input.title }),
-        ...(input.description && { description: input.description }),
-        ...(input.price != null && { price: input.price }),
-        ...(input.compareAtPrice !== undefined && { compareAtPrice: input.compareAtPrice }),
-        ...(input.category && { category: input.category }),
-        ...(input.tags && { tags: input.tags }),
-        ...(input.images && { images: input.images }),
-        ...(input.stock != null && { stock: input.stock }),
-        ...(input.sku !== undefined && { sku: input.sku }),
-        ...(input.status && { status: input.status }),
-        ...(input.isPerishable != null && { isPerishable: input.isPerishable }),
-        ...(input.expiresAt !== undefined && {
-          expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
-        }),
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const p = await tx.product.update({
+        where: { id },
+        data: {
+          ...(input.title && { title: input.title }),
+          ...(input.description && { description: input.description }),
+          ...(input.price != null && { price: input.price }),
+          ...(input.compareAtPrice !== undefined && { compareAtPrice: input.compareAtPrice }),
+          ...(input.category && { category: input.category }),
+          ...(input.tags && { tags: input.tags }),
+          ...(input.images && { images: input.images }),
+          ...(input.stock != null && { stock: input.stock }),
+          ...(input.sku !== undefined && { sku: input.sku }),
+          ...(input.status && { status: input.status }),
+          ...(input.isPerishable != null && { isPerishable: input.isPerishable }),
+          ...(input.expiresAt !== undefined && {
+            expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+          }),
+        },
+      });
+
+      if (input.variants !== undefined) {
+        await tx.productVariant.deleteMany({ where: { productId: id } });
+        for (const variant of input.variants ?? []) {
+          await tx.productVariant.create({
+            data: {
+              productId: id,
+              name: variant.name,
+              options: {
+                create: variant.options.map((opt) => ({
+                  label: opt.label,
+                  price: opt.price ?? null,
+                  stock: opt.stock,
+                })),
+              },
+            },
+          });
+        }
+      }
+
+      return p;
     });
 
     const productWithMerchant = await prisma.product.findUnique({

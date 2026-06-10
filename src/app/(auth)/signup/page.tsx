@@ -5,17 +5,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { toast } from "sonner";
 import { registerSchema, type RegisterInput } from "@/lib/validations";
 import { registerUser } from "@/server/actions/auth.actions";
 import { signIn } from "next-auth/react";
 import { NIGERIAN_FACULTIES, NIGERIAN_HOSTELS } from "@/lib/constants";
-import { Eye, EyeOff, Loader2, Store } from "lucide-react";
+import { Eye, EyeOff, Loader2, Store, AlertCircle } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
@@ -35,16 +35,17 @@ export default function SignupPage() {
 
   async function onSubmit(data: RegisterInput) {
     setLoading(true);
+    setServerError("");
     try {
       const result = await registerUser(data);
       if (result.error) {
-        toast.error(result.error);
+        setServerError(result.error);
         return;
       }
       await signIn("credentials", { email: data.email, password: data.password, redirect: false });
       router.push("/onboarding");
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      setServerError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,6 +66,13 @@ export default function SignupPage() {
         </div>
 
         <div className="rounded-2xl p-8 space-y-4" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-modal)" }}>
+          {serverError && (
+            <div className="flex items-start gap-3 p-3.5 rounded-xl text-sm"
+              style={{ background: "var(--color-danger-soft)", border: "1px solid var(--color-danger)" }}>
+              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" style={{ color: "var(--color-danger)" }} />
+              <p style={{ color: "var(--color-danger)" }}>{serverError}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name + Matric */}
             <div className="grid grid-cols-2 gap-3">
@@ -116,7 +124,7 @@ export default function SignupPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--color-text-2)" }}>Faculty</label>
-                <select {...register("faculty")} className="w-full h-10 px-3 rounded-lg text-sm outline-none" style={{ ...field(!!errors.faculty), appearance: "none" as const }}>
+                <select {...register("faculty")} className="w-full h-10 px-3 rounded-lg text-sm outline-none" style={field(!!errors.faculty)}>
                   <option value="">Select…</option>
                   {NIGERIAN_FACULTIES.map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
@@ -124,7 +132,7 @@ export default function SignupPage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--color-text-2)" }}>Hostel</label>
-                <select {...register("hostel")} className="w-full h-10 px-3 rounded-lg text-sm outline-none" style={{ ...field(!!errors.hostel), appearance: "none" as const }}>
+                <select {...register("hostel")} className="w-full h-10 px-3 rounded-lg text-sm outline-none" style={field(!!errors.hostel)}>
                   <option value="">Select…</option>
                   {NIGERIAN_HOSTELS.map((h) => <option key={h} value={h}>{h}</option>)}
                 </select>

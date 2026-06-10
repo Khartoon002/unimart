@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, ShoppingCart, User, Settings, LogOut, Repeat, ShoppingBag } from "lucide-react";
+import { Bell, ShoppingCart, User, Settings, LogOut, Repeat } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useNotifications, useMarkNotificationsRead } from "@/hooks/useNotifications";
-import { useDebounce } from "@/hooks/useDebounce";
 import { getInitials, formatRelativeTime } from "@/lib/utils";
 import { updateActiveRole } from "@/server/actions/auth.actions";
 import { toast } from "sonner";
@@ -18,11 +17,9 @@ import type { UserRole } from "@prisma/client";
 export function TopBar() {
   const { data: session, update: updateSession } = useSession();
   const router = useRouter();
-  const [query, setQuery] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [switching, startSwitch] = useTransition();
-  const debouncedQuery = useDebounce(query, 300);
   const cartCount = useCartStore((s) => s.itemCount);
   const openCartDrawer = useUIStore((s) => s.openCartDrawer);
   const { data: notifData } = useNotifications();
@@ -33,11 +30,6 @@ export function TopBar() {
   const user = session?.user;
   const isMerchant = user?.activeRole === "MERCHANT";
   const hasBothRoles = user?.roles?.length === 2;
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (query.trim()) router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-  }
 
   function handleSwitchRole() {
     const newRole: UserRole = isMerchant ? "BUYER" : "MERCHANT";
@@ -51,24 +43,13 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center gap-4 h-16 px-6"
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 h-16 px-6"
       style={{ background: "linear-gradient(180deg, var(--color-bg) 70%, transparent)", backdropFilter: "blur(8px)" }}>
-      {/* Search */}
-      <form onSubmit={handleSearch} className="flex-1 max-w-xl">
-        <div className="relative flex items-center h-10 rounded-full px-4 gap-3 transition-all"
-          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{ color: "var(--color-text-3)", flexShrink: 0 }}>
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-          </svg>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search UniMart…"
-            className="flex-1 bg-transparent outline-none text-sm"
-            style={{ color: "var(--color-text-1)" }}
-          />
-        </div>
-      </form>
+      {/* Brand wordmark (small, shown only on desktop) */}
+      <span className="hidden lg:block text-sm font-bold tracking-tight" style={{ color: "var(--color-text-3)" }}>
+        UniMart
+      </span>
+      <div className="flex-1" />
 
       <div className="flex items-center gap-2">
         {!user ? (
