@@ -91,6 +91,7 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -103,13 +104,23 @@
     color: var(--color-text-1);
   }
 
-  ::-webkit-scrollbar       { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--color-surface); }
-  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+  /* Vertical scrollbars — subtle, dark-themed */
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
 }
 
 @layer utilities {
+  /* Hide scrollbar cross-browser — used on all horizontal scroll containers */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   .font-display   { font-family: var(--font-display); }
   .font-body      { font-family: var(--font-body); }
   .font-price     { font-family: var(--font-mono); font-feature-settings: "tnum"; }

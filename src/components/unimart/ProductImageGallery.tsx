@@ -54,7 +54,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
 
       {/* Thumbnails */}
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {images.map((src, i) => (
             <button key={i} onClick={() => setActive(i)}
               className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all"
