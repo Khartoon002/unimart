@@ -1,0 +1,350 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "wasm"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  MERCHANT
+  ADMIN
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  DISPUTED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum NotifType {
+  NEW_ORDER
+  ORDER_SHIPPED
+  ORDER_CONFIRMED
+  ORDER_DELIVERED
+  PAYMENT_RECEIVED
+  NEW_REVIEW
+  LISTING_EXPIRING
+  ANNOUNCEMENT
+}
+
+enum ProductCategory {
+  ELECTRONICS
+  BOOKS
+  FASHION
+  FOOD
+  SERVICES
+  ART
+  BEAUTY
+  SPORTS
+  STATIONERY
+  OTHER
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  emailVerified  DateTime?
+  password       String
+  name           String
+  avatar         String?
+  matricNumber   String    @unique
+  faculty        String?
+  hostel         String?
+  bio            String?   @db.Text
+  roles          UserRole[] @default([BUYER])
+  activeRole     UserRole  @default(BUYER)
+  onboardingDone Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  merchantProfile MerchantProfile?
+  orders          Order[]
+  reviews         Review[]
+  savedProducts   SavedProduct[]
+  addresses       Address[]
+  conversations   ConversationParticipant[]
+  sentMessages    Message[]
+  notifications   Notification[]
+  otps            OTP[]
+
+  @@index([email])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model MerchantProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storeName           String   @unique
+  storeBanner         String?
+  storeDescription    String?  @db.Text
+  isVerified          Boolean  @default(false)
+  rating              Float    @default(0)
+  totalRatings        Int      @default(0)
+  totalSales          Int      @default(0)
+  withdrawableBalance Decimal  @default(0) @db.Decimal(12, 2)
+  pendingBalance      Decimal  @default(0) @db.Decimal(12, 2)
+  totalEarned         Decimal  @default(0) @db.Decimal(12, 2)
+  responseRate        Float    @default(100)
+  onTimeRate          Float    @default(100)
+  createdAt           DateTime @default(now())
+
+  bankAccounts BankAccount[]
+  products     Product[]
+  orders       Order[]
+  transactions Transaction[]
+
+  @@index([storeName])
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  merchantId     String
+  merchant       MerchantProfile @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  title          String
+  description    String          @db.Text
+  price          Decimal         @db.Decimal(12, 2)
+  compareAtPrice Decimal?        @db.Decimal(12, 2)
+  category       ProductCategory
+  tags           String[]
+  images         String[]
+  stock          Int             @default(0)
+  sku            String?
+  status         ProductStatus   @default(DRAFT)
+  isPerishable   Boolean         @default(false)
+  expiresAt      DateTime?
+  viewCount      Int             @default(0)
+  orderCount     Int             @default(0)
+  rating         Float           @default(0)
+  reviewCount    Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+  reviews    Review[]
+  savedBy    SavedProduct[]
+
+  @@index([merchantId])
+  @@index([category, status])
+  @@index([isPerishable, expiresAt])
+  @@index([status, createdAt])
+}
+
+model ProductVariant {
+  id        String          @id @default(cuid())
+  productId String
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  options   VariantOption[]
+}
+
+model VariantOption {
+  id        String         @id @default(cuid())
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  label     String
+  price     Decimal?       @db.Decimal(12, 2)
+  stock     Int            @default(0)
+}
+
+model Order {
+  id              String          @id @default(cuid())
+  buyerId         String
+  buyer           User            @relation(fields: [buyerId], references: [id])
+  merchantId      String
+  merchant        MerchantProfile @relation(fields: [merchantId], references: [id])
+  items           OrderItem[]
+  subtotal        Decimal         @db.Decimal(12, 2)
+  platformFee     Decimal         @db.Decimal(12, 2)
+  deliveryFee     Decimal         @default(0) @db.Decimal(12, 2)
+  total           Decimal         @db.Decimal(12, 2)
+  status          OrderStatus     @default(PENDING)
+  deliveryAddress Json
+  deliveryNote    String?
+  paystackRef     String?         @unique
+  escrowReleaseAt DateTime?
+  timeline        OrderEvent[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([buyerId, status])
+  @@index([merchantId, status])
+  @@index([paystackRef])
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  quantity     Int
+  unitPrice    Decimal  @db.Decimal(12, 2)
+  variantLabel String?
+}
+
+model OrderEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+}
+
+model Review {
+  id               String   @id @default(cuid())
+  buyerId          String
+  buyer            User     @relation(fields: [buyerId], references: [id])
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id])
+  orderId          String   @unique
+  rating           Int
+  comment          String   @db.Text
+  images           String[]
+  helpfulCount     Int      @default(0)
+  verifiedPurchase Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  @@unique([buyerId, orderId])
+  @@index([productId])
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label         String
+  recipientName String
+  phone         String
+  hostel        String?
+  room          String?
+  faculty       String?
+  pickupPoint   String?
+  note          String?
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model SavedProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model BankAccount {
+  id            String          @id @default(cuid())
+  merchantId    String
+  merchant      MerchantProfile @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  bankCode      String
+  bankName      String
+  accountNumber String
+  accountName   String
+  recipientCode String
+  isDefault     Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+}
+
+model Transaction {
+  id           String          @id @default(cuid())
+  merchantId   String
+  merchant     MerchantProfile @relation(fields: [merchantId], references: [id])
+  type         String
+  amount       Decimal         @db.Decimal(12, 2)
+  reference    String          @unique
+  orderId      String?
+  balanceAfter Decimal         @db.Decimal(12, 2)
+  note         String?
+  createdAt    DateTime        @default(now())
+
+  @@index([merchantId, createdAt])
+}
+
+model Conversation {
+  id            String                    @id @default(cuid())
+  participants  ConversationParticipant[]
+  messages      Message[]
+  productId     String?
+  lastMessageAt DateTime                  @default(now())
+  createdAt     DateTime                  @default(now())
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  unreadCount    Int          @default(0)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  content        String       @db.Text
+  productRefId   String?
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotifType
+  title     String
+  body      String
+  href      String?
+  isRead    Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  @@index([userId, isRead])
+}
