@@ -31,7 +31,7 @@ export function FilterSidebar({ filters, onChange, onClose }: FilterSidebarProps
   }
 
   return (
-    <div className="w-64 flex-shrink-0">
+    <div className="w-full md:w-64 md:flex-shrink-0">
       <div className="rounded-2xl p-5 space-y-6 sticky top-20"
         style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
         <div className="flex items-center justify-between">

@@ -22,165 +22,203 @@ export function ProductCard({ product, onAdd, onSave, isSaved, view = "grid", in
   const [hovered, setHovered] = useState(false);
   const isExpired = product.isPerishable && product.expiresAt && new Date(product.expiresAt) <= new Date();
   const outOfStock = product.stock === 0;
+  const canAdd = !outOfStock && !isExpired;
 
+  /* ── List view ──────────────────────────────────────────────── */
   if (view === "list") {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.04 }}
-        className="flex gap-4 p-3 rounded-2xl transition-shadow"
+        className="flex gap-3 p-3 rounded-2xl"
         style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
       >
         <Link href={`/product/${product.id}`} className="flex-shrink-0">
-          <div className="relative w-28 h-20 rounded-xl overflow-hidden" style={{ background: "var(--color-surface-2)" }}>
+          <div className="relative w-20 h-20 rounded-xl overflow-hidden" style={{ background: "var(--color-surface-2)" }}>
             {product.images[0] && <Image src={product.images[0]} alt={product.title} fill className="object-cover" />}
           </div>
         </Link>
         <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
           <div>
             <Link href={`/product/${product.id}`}>
-              <h3 className="text-sm font-medium leading-snug line-clamp-1" style={{ color: "var(--color-text-1)" }}>{product.title}</h3>
+              <h3 className="text-sm font-semibold leading-snug line-clamp-2" style={{ color: "var(--color-text-1)" }}>{product.title}</h3>
             </Link>
             <div className="flex items-center gap-1 mt-1">
-              <span className="text-xs truncate" style={{ color: "var(--color-text-2)" }}>{product.merchantStoreName}</span>
+              <span className="text-xs truncate" style={{ color: "var(--color-text-3)" }}>{product.merchantStoreName}</span>
               {product.merchantVerified && <BadgeCheck size={11} style={{ color: "var(--color-primary)" }} />}
             </div>
           </div>
           <PriceTag price={product.price} compareAt={product.compareAtPrice} size="sm" />
         </div>
-        <div className="flex items-center">
+        <div className="flex flex-col items-end justify-between gap-2">
           <button
-            onClick={(e) => { e.preventDefault(); onAdd?.(product); }}
-            disabled={outOfStock}
-            className="h-9 px-4 rounded-full text-xs font-semibold flex items-center gap-1.5"
-            style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-border)", color: "var(--color-text-1)" }}
+            onClick={(e) => { e.preventDefault(); onSave?.(product); }}
+            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: "var(--color-surface-2)", color: isSaved ? "var(--color-danger)" : "var(--color-text-3)" }}
           >
-            <ShoppingCart size={13} /> Add
+            <Heart size={14} style={{ fill: isSaved ? "var(--color-danger)" : "none" }} />
+          </button>
+          <button
+            onClick={(e) => { e.preventDefault(); if (canAdd) onAdd?.(product); }}
+            disabled={!canAdd}
+            className="h-8 px-4 rounded-full text-xs font-semibold flex items-center gap-1.5 flex-shrink-0 transition-opacity disabled:opacity-40"
+            style={{ background: "var(--color-primary)", color: "#fff" }}
+          >
+            <ShoppingCart size={12} /> Add
           </button>
         </div>
       </motion.div>
     );
   }
 
+  /* ── Grid view ──────────────────────────────────────────────── */
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.045, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={{ y: -4 }}
-      className="rounded-2xl overflow-hidden cursor-pointer"
+      transition={{ delay: index * 0.04, ease: [0.4, 0, 0.2, 1] }}
+      className="rounded-2xl overflow-hidden flex flex-col"
       style={{
         background: "var(--color-surface)",
         boxShadow: hovered ? "var(--shadow-hover)" : "var(--shadow-card)",
-        transition: "box-shadow 220ms",
+        transition: "box-shadow 200ms",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
-        <Link href={`/product/${product.id}`}>
-          <motion.div className="relative w-full h-full" animate={{ scale: hovered ? 1.05 : 1 }} transition={{ duration: 0.38 }}>
-            <div className="relative w-full h-full" style={{ background: "var(--color-surface-2)" }}>
-              {product.images[0] && (
-                <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
-              )}
-            </div>
-          </motion.div>
+      {/* ── Image area ── */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: "1 / 1" }}>
+        <Link href={`/product/${product.id}`} className="block w-full h-full">
+          <div className="relative w-full h-full" style={{ background: "var(--color-surface-2)" }}>
+            {product.images[0] && (
+              <Image
+                src={product.images[0]}
+                alt={product.title}
+                fill
+                className="object-cover"
+                style={{ transform: hovered ? "scale(1.06)" : "scale(1)", transition: "transform 380ms ease" }}
+              />
+            )}
+          </div>
         </Link>
 
-        {/* Sold out overlay */}
+        {/* Sold-out overlay */}
         {(outOfStock || isExpired) && (
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(12,12,15,0.65)", backdropFilter: "blur(2px)" }}>
-            <span className="text-sm font-bold" style={{ color: "var(--color-text-2)" }}>{isExpired ? "Expired" : "Sold out"}</span>
+          <div className="absolute inset-0 flex items-center justify-center"
+            style={{ background: "rgba(12,12,15,0.65)", backdropFilter: "blur(2px)" }}>
+            <span className="text-sm font-bold" style={{ color: "var(--color-text-2)" }}>
+              {isExpired ? "Expired" : "Sold out"}
+            </span>
           </div>
         )}
 
+        {/* Top row: discount badge (left) + save (right) */}
+        <div className="absolute top-2 left-2 right-2 flex items-start justify-between pointer-events-none">
+          {product.compareAtPrice ? (
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold pointer-events-auto"
+              style={{ background: "var(--color-accent)", color: "#1A1500" }}>
+              -{Math.round((1 - product.price / product.compareAtPrice) * 100)}%
+            </span>
+          ) : <span />}
+
+          <button
+            onClick={(e) => { e.preventDefault(); onSave?.(product); }}
+            className="w-8 h-8 rounded-full flex items-center justify-center pointer-events-auto transition-transform active:scale-90"
+            style={{ background: "rgba(12,12,15,0.72)", backdropFilter: "blur(6px)", color: isSaved ? "var(--color-danger)" : "#fff" }}
+          >
+            <Heart size={14} style={{ fill: isSaved ? "var(--color-danger)" : "none" }} />
+          </button>
+        </div>
+
         {/* Fresh badge */}
         {product.isPerishable && !isExpired && (
-          <span className="absolute bottom-2 left-2 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
-            style={{ background: "rgba(12,12,15,0.8)", backdropFilter: "blur(6px)", color: "var(--color-fresh)", border: "1px solid var(--color-fresh)" }}>
+          <span className="absolute bottom-9 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold"
+            style={{ background: "rgba(12,12,15,0.8)", color: "var(--color-fresh)", border: "1px solid var(--color-fresh)" }}>
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--color-fresh)" }} />
             Fresh
           </span>
         )}
 
-        {/* Discount badge */}
-        {product.compareAtPrice && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-bold"
-            style={{ background: "var(--color-accent)", color: "#1A1500" }}>
-            -{Math.round((1 - product.price / product.compareAtPrice) * 100)}%
-          </span>
-        )}
-
-        {/* Save button */}
-        <button
-          onClick={(e) => { e.preventDefault(); onSave?.(product); }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-transform active:scale-90"
-          style={{ background: "rgba(12,12,15,0.72)", backdropFilter: "blur(6px)", color: isSaved ? "var(--color-danger)" : "var(--color-text-1)" }}
-        >
-          <Heart size={15} style={{ fill: isSaved ? "var(--color-danger)" : "none" }} />
-        </button>
-
-        {/* Add to Cart hover button */}
+        {/* Desktop: hover add-to-cart bar */}
         <AnimatePresence>
-          {hovered && !outOfStock && !isExpired && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
+          {hovered && canAdd && (
+            <motion.button
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              className="absolute bottom-2 left-2 right-2"
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.15 }}
+              onClick={(e) => { e.preventDefault(); onAdd?.(product); }}
+              className="absolute bottom-0 left-0 right-0 h-9 hidden md:flex items-center justify-center gap-2 text-xs font-bold"
+              style={{ background: "var(--color-accent)", color: "#1A1500" }}
             >
-              <button
-                onClick={(e) => { e.preventDefault(); onAdd?.(product); }}
-                className="w-full h-9 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5"
-                style={{ background: "var(--color-accent)", color: "#1A1500" }}
-              >
-                <ShoppingCart size={14} /> Add to Cart
-              </button>
-            </motion.div>
+              <ShoppingCart size={14} /> Add to Cart
+            </motion.button>
           )}
         </AnimatePresence>
+
+        {/* Mobile: always-visible add-to-cart bar */}
+        <button
+          onClick={(e) => { e.preventDefault(); if (canAdd) onAdd?.(product); }}
+          disabled={!canAdd}
+          className="absolute bottom-0 left-0 right-0 h-8 flex md:hidden items-center justify-center gap-1.5 text-xs font-bold transition-opacity disabled:opacity-50"
+          style={{ background: canAdd ? "var(--color-accent)" : "var(--color-surface-2)", color: canAdd ? "#1A1500" : "var(--color-text-3)" }}
+        >
+          <ShoppingCart size={12} />
+          {outOfStock ? "Sold out" : isExpired ? "Expired" : "Add"}
+        </button>
       </div>
 
-      {/* Info */}
-      <Link href={`/product/${product.id}`}>
-        <div className="p-3.5">
-          <div className="flex items-center gap-1.5 mb-2">
+      {/* ── Info area ── */}
+      <Link href={`/product/${product.id}`} className="flex-1 flex flex-col">
+        <div className="p-3 flex-1 flex flex-col gap-1.5">
+          {/* Merchant name */}
+          <div className="flex items-center gap-1">
             {product.merchantAvatar && (
-              <Image src={product.merchantAvatar} alt="" width={18} height={18} className="rounded-full object-cover flex-shrink-0" />
+              <Image src={product.merchantAvatar} alt="" width={14} height={14}
+                className="rounded-full object-cover flex-shrink-0 hidden sm:block" />
             )}
-            <span className="text-xs truncate" style={{ color: "var(--color-text-2)" }}>{product.merchantStoreName}</span>
-            {product.merchantVerified && <BadgeCheck size={12} style={{ color: "var(--color-primary)", flexShrink: 0 }} />}
+            <span className="text-[11px] truncate font-medium" style={{ color: "var(--color-text-3)" }}>
+              {product.merchantStoreName}
+            </span>
+            {product.merchantVerified && (
+              <BadgeCheck size={10} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
+            )}
           </div>
 
-          <h3 className="text-sm font-medium leading-snug line-clamp-2 mb-2.5" style={{ color: "var(--color-text-1)", minHeight: "2.5rem" }}>
+          {/* Title */}
+          <h3 className="text-sm font-semibold leading-snug line-clamp-2" style={{ color: "var(--color-text-1)" }}>
             {product.title}
           </h3>
 
-          <div className="flex items-center justify-between">
+          {/* Price */}
+          <div className="mt-auto pt-1">
             <PriceTag price={product.price} compareAt={product.compareAtPrice} size="sm" />
-            {product.stock <= 3 && product.stock > 0 && (
-              <span className="text-xs font-semibold" style={{ color: "var(--color-warning)" }}>{product.stock} left</span>
-            )}
           </div>
 
+          {/* Reviews — desktop only to keep mobile card clean */}
           {product.reviewCount > 0 && (
-            <div className="flex items-center gap-1 mt-1.5">
+            <div className="hidden sm:flex items-center gap-1 mt-0.5">
               <Star size={11} style={{ fill: "var(--color-accent)", color: "var(--color-accent)" }} />
               <span className="text-xs font-semibold" style={{ color: "var(--color-accent)" }}>{product.rating.toFixed(1)}</span>
               <span className="text-xs" style={{ color: "var(--color-text-3)" }}>({product.reviewCount})</span>
             </div>
           )}
 
+          {/* Countdown for fresh items */}
           {product.isPerishable && product.expiresAt && !isExpired && (
-            <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: "1px solid var(--color-border)" }}>
-              <span className="text-xs" style={{ color: "var(--color-text-3)" }}>Expires in</span>
+            <div className="flex items-center justify-between pt-1.5 mt-1"
+              style={{ borderTop: "1px solid var(--color-border)" }}>
+              <span className="text-[10px]" style={{ color: "var(--color-text-3)" }}>Expires</span>
               <CountdownTimer expiresAt={product.expiresAt} size="sm" />
             </div>
+          )}
+
+          {/* Low stock warning */}
+          {product.stock > 0 && product.stock <= 3 && (
+            <p className="text-[10px] font-semibold" style={{ color: "var(--color-warning)" }}>
+              Only {product.stock} left
+            </p>
           )}
         </div>
       </Link>
