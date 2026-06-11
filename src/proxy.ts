@@ -38,7 +38,7 @@ export async function proxy(req: NextRequest) {
   // Runs on Node.js runtime (Next.js 16 proxy convention), so next-auth/jwt is fine
   const token = await getToken({
     req,
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
     secureCookie: process.env.NODE_ENV === "production",
   });
 
