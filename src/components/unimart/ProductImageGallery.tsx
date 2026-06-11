@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -28,9 +27,15 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative w-full h-full"
+            className="absolute inset-0 w-full h-full"
           >
-            <Image src={images[active]} alt={title} fill className="object-contain" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={images[active]}
+              alt={title}
+              className="w-full h-full object-contain"
+              onError={(e) => { e.currentTarget.style.opacity = "0.3"; }}
+            />
           </motion.div>
         </AnimatePresence>
 
@@ -57,12 +62,13 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {images.map((src, i) => (
             <button key={i} onClick={() => setActive(i)}
-              className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all"
+              className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all"
               style={{
                 border: `2px solid ${i === active ? "var(--color-primary)" : "var(--color-border)"}`,
                 background: "var(--color-surface-2)",
               }}>
-              <Image src={src} alt="" fill className="object-cover" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.opacity = "0.3"; }} />
             </button>
           ))}
         </div>

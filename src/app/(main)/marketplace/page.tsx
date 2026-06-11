@@ -52,7 +52,7 @@ export default function MarketplacePage() {
         {/* Mobile filter toggle */}
         <button
           onClick={() => setFilterOpen(!filterOpen)}
-          className="flex items-center gap-1.5 h-12 px-3 rounded-2xl text-sm font-semibold flex-shrink-0 md:hidden relative"
+          className="flex items-center gap-1.5 h-12 px-3 rounded-2xl text-sm font-semibold flex-shrink-0 xl:hidden relative"
           style={{
             background: filterOpen ? "var(--color-primary)" : "var(--color-surface)",
             border: `1px solid ${filterOpen ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -70,7 +70,7 @@ export default function MarketplacePage() {
         </button>
 
         {/* Desktop view toggle */}
-        <div className="hidden md:flex items-center rounded-xl overflow-hidden flex-shrink-0"
+        <div className="hidden sm:flex items-center rounded-xl overflow-hidden flex-shrink-0"
           style={{ border: "1px solid var(--color-border)" }}>
           {(["grid", "list"] as const).map((v) => (
             <button key={v} onClick={() => setView(v)}
@@ -114,7 +114,7 @@ export default function MarketplacePage() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden md:hidden"
+            className="overflow-hidden xl:hidden"
           >
             <FilterSidebar
               filters={filters}
@@ -127,15 +127,15 @@ export default function MarketplacePage() {
 
       {/* ── Main content: sidebar (desktop) + grid ── */}
       <div className="flex gap-8">
-        {/* Desktop filter sidebar — only in the flex row on md+ */}
-        <div className="hidden md:block">
+        {/* Desktop filter sidebar — only in the flex row on xl+ */}
+        <div className="hidden xl:block">
           <FilterSidebar filters={filters} onChange={setFilters} />
         </div>
 
         {/* Product grid */}
         <div className="flex-1 min-w-0">
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
               {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} className="rounded-2xl animate-pulse"
                   style={{ background: "var(--color-surface)", aspectRatio: "1/1" }} />

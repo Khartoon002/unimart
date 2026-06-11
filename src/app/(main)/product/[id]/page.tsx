@@ -88,8 +88,8 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Stock */}
           <div className="flex items-center gap-2">
-            <Package size={14} style={{ color: isSold ? "var(--color-danger)" : "var(--color-success)" }} />
-            <span className="text-sm font-medium" style={{ color: isSold ? "var(--color-danger)" : "var(--color-success)" }}>
+            <Package size={14} style={{ color: isSold ? "var(--color-danger)" : "var(--color-fresh)" }} />
+            <span className="text-sm font-medium" style={{ color: isSold ? "var(--color-danger)" : "var(--color-fresh)" }}>
               {isSold ? "Out of stock" : `${product.stock} in stock`}
             </span>
           </div>

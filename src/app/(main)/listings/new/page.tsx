@@ -32,7 +32,7 @@ export default function NewListingPage() {
   const categoryLabel = PRODUCT_CATEGORIES.find((c) => c.value === selectedCategory)?.label ?? "";
 
   function addImageField() {
-    if (imageUrls.length < 4) setImageUrls((prev) => [...prev, ""]);
+    if (imageUrls.length < 8) setImageUrls((prev) => [...prev, ""]);
   }
 
   function removeImageField(i: number) {
@@ -149,7 +149,7 @@ export default function NewListingPage() {
         {/* Images */}
         <div className="p-5 rounded-2xl space-y-3" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
           <h2 className="font-semibold">Product images</h2>
-          <p className="text-xs" style={{ color: "var(--color-text-3)" }}>Paste image URLs (up to 4). Use direct links ending in .jpg, .png, etc.</p>
+          <p className="text-xs" style={{ color: "var(--color-text-3)" }}>Paste any image link (up to 8). Works with Google Images, product sites, or any direct image URL.</p>
           {imageUrls.map((url, i) => (
             <div key={i} className="flex gap-2 items-center">
               <input
@@ -176,7 +176,7 @@ export default function NewListingPage() {
               )}
             </div>
           ))}
-          {imageUrls.length < 4 && (
+          {imageUrls.length < 8 && (
             <button type="button" onClick={addImageField} className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--color-primary)" }}>
               <Plus size={15} /> Add another image
             </button>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, BadgeCheck, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,7 +35,10 @@ export function ProductCard({ product, onAdd, onSave, isSaved, view = "grid", in
       >
         <Link href={`/product/${product.id}`} className="flex-shrink-0">
           <div className="relative w-20 h-20 rounded-xl overflow-hidden" style={{ background: "var(--color-surface-2)" }}>
-            {product.images[0] && <Image src={product.images[0]} alt={product.title} fill className="object-cover" />}
+            {product.images[0] && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={product.images[0]} alt={product.title} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+            )}
           </div>
         </Link>
         <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
@@ -92,12 +94,13 @@ export function ProductCard({ product, onAdd, onSave, isSaved, view = "grid", in
         <Link href={`/product/${product.id}`} className="block w-full h-full">
           <div className="relative w-full h-full" style={{ background: "var(--color-surface-2)" }}>
             {product.images[0] && (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={product.images[0]}
                 alt={product.title}
-                fill
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 style={{ transform: hovered ? "scale(1.06)" : "scale(1)", transition: "transform 380ms ease" }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
               />
             )}
           </div>
@@ -175,8 +178,8 @@ export function ProductCard({ product, onAdd, onSave, isSaved, view = "grid", in
           {/* Merchant name */}
           <div className="flex items-center gap-1">
             {product.merchantAvatar && (
-              <Image src={product.merchantAvatar} alt="" width={14} height={14}
-                className="rounded-full object-cover flex-shrink-0 hidden sm:block" />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={product.merchantAvatar} alt="" className="w-3.5 h-3.5 rounded-full object-cover flex-shrink-0 hidden sm:block" onError={(e) => { e.currentTarget.style.display = "none"; }} />
             )}
             <span className="text-[11px] truncate font-medium" style={{ color: "var(--color-text-3)" }}>
               {product.merchantStoreName}

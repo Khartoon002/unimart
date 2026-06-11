@@ -10,9 +10,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pusher-js'],
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "utfs.io" },
-      { protocol: "https", hostname: "picsum.photos" },
-      { protocol: "https", hostname: "**.ufs.sh" },
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
     ],
   },
   experimental: {
