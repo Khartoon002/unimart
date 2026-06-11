@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import {
@@ -43,6 +43,7 @@ const MERCHANT_NAV = [
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session, update: updateSession } = useSession();
+  const router = useRouter();
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const cartCount = useCartStore((s) => s.itemCount);
@@ -58,7 +59,10 @@ export function Sidebar() {
     const newRole = isMerchant ? "BUYER" : "MERCHANT";
     startRoleTransition(async () => {
       const result = await updateActiveRole(newRole as "BUYER" | "MERCHANT");
-      if (!result.error) await updateSession({ activeRole: newRole });
+      if (!result.error) {
+        await updateSession({ activeRole: newRole });
+        router.push(newRole === "MERCHANT" ? "/dashboard" : "/marketplace");
+      }
     });
   }
 

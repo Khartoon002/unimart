@@ -51,7 +51,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   // Support both AUTH_SECRET (v5 standard) and NEXTAUTH_SECRET (legacy) so
   // existing deployments that haven't renamed the env var still work.
-  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "unimart-prototype-secret-do-not-use-in-production",
   providers: [
     Credentials({
       name: "Credentials",

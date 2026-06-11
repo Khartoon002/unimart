@@ -57,8 +57,8 @@ function PaymentContent() {
             >
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5 }}>
                 <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ background: "color-mix(in srgb, var(--color-success) 15%, transparent)" }}>
-                  <CheckCircle2 size={44} style={{ color: "var(--color-success)" }} />
+                  style={{ background: "var(--color-fresh-soft)" }}>
+                  <CheckCircle2 size={44} style={{ color: "var(--color-fresh)" }} />
                 </div>
               </motion.div>
               <h2 className="font-display text-2xl font-bold">Payment confirmed!</h2>

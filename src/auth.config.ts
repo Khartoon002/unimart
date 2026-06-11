@@ -6,7 +6,7 @@ type UserRole = "BUYER" | "MERCHANT";
 // Edge-safe config: no Prisma, no bcrypt — used by middleware
 export const authConfig = {
   trustHost: true,
-  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "unimart-prototype-secret-do-not-use-in-production",
   providers: [],
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   callbacks: {

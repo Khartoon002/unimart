@@ -23,8 +23,8 @@ function SuccessContent() {
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5 }}>
         <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 mx-auto"
-          style={{ background: "color-mix(in srgb, var(--color-success) 15%, transparent)" }}>
-          <CheckCircle2 size={44} style={{ color: "var(--color-success)" }} />
+          style={{ background: "var(--color-fresh-soft)" }}>
+          <CheckCircle2 size={44} style={{ color: "var(--color-fresh)" }} />
         </div>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="space-y-3">

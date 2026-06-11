@@ -38,7 +38,7 @@ export function TopBar() {
       if (result.error) { toast.error(result.error); return; }
       await updateSession({ activeRole: newRole });
       toast.success(`Switched to ${newRole === "MERCHANT" ? "Merchant" : "Buyer"} mode`);
-      router.refresh();
+      router.push(newRole === "MERCHANT" ? "/dashboard" : "/marketplace");
     });
   }
 

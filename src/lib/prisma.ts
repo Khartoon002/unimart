@@ -21,6 +21,10 @@ function buildUrl() {
     // Add connect_timeout so suspended databases wake up before timing out
     u.searchParams.set("connect_timeout", "15");
     u.searchParams.set("sslmode", "require");
+    // Prisma requires pgbouncer=true when routing through Neon's pooler
+    if (u.hostname.includes("-pooler.") && u.hostname.includes("neon.tech")) {
+      u.searchParams.set("pgbouncer", "true");
+    }
     return u.toString();
   } catch {
     return url;
