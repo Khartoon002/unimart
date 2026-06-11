@@ -1,10 +1,16 @@
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "UniMart <no-reply@unimart.app>";
 
 export async function sendWelcomeEmail(to: string, name: string) {
+  if (!resend) {
+    console.warn("Resend not configured — skipping welcome email");
+    return;
+  }
   await resend.emails.send({
     from: FROM,
     to,
@@ -33,6 +39,10 @@ export async function sendOrderConfirmationEmail(
   to: string,
   order: { id: string; total: number; items: { title: string; qty: number }[] }
 ) {
+  if (!resend) {
+    console.warn("Resend not configured — skipping order confirmation email");
+    return;
+  }
   await resend.emails.send({
     from: FROM,
     to,
@@ -55,6 +65,10 @@ export async function sendOrderConfirmationEmail(
 }
 
 export async function sendOrderShippedEmail(to: string, orderId: string) {
+  if (!resend) {
+    console.warn("Resend not configured — skipping order shipped email");
+    return;
+  }
   await resend.emails.send({
     from: FROM,
     to,
@@ -73,6 +87,10 @@ export async function sendOrderShippedEmail(to: string, orderId: string) {
 }
 
 export async function sendPasswordResetEmail(to: string, otp: string) {
+  if (!resend) {
+    console.warn("Resend not configured — skipping password reset email");
+    return;
+  }
   await resend.emails.send({
     from: FROM,
     to,
